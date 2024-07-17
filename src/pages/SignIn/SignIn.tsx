@@ -26,8 +26,9 @@ const SignIn: React.FC = () => {
     const handleSignIn = async () => {
         try {
             if (loginUser.email !== '' || loginUser.password !== '') {
-                await login(loginUser).then(res => {
+                await login(loginUser).then(async res => {
                     if (res?.data?.authToken) {
+                        await getMyAccount()
                         navigate('/')
                     }
                 });
