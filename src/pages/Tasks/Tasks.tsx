@@ -3,7 +3,6 @@ import { Grid } from "@mui/material";
 import TaskList from "./TaskList";
 import TaskDetails from "./TaskDetails";
 import Suggestions from "./Suggestions";
-import { useSuggestions } from "../../hooks/useSuggestions";
 import { Task, TaskRequest } from "../../types/TasksResponse";
 import { getTasks } from "../../core/requests/getMyTasks";
 import { useAppSelector } from "../../config/store.config";
@@ -11,13 +10,17 @@ import { getMyTasks } from "../../context/tasksSlice/selectors";
 import { getMySuggestions } from "../../core/requests/getMySuggestions";
 import { SuggesionsRequest } from "../../types/SuggestionsRequest";
 import { getSuggestions } from "../../context/suggestionsSlice/selectors";
+import { getUser } from "../../context/authSlice/selectors";
+import { addTask } from "../../core/requests/addTask";
+import { getMyAccount } from "../../core/requests/getMyAccount";
 
 const Tasks: React.FC = () => {
   const tasks = useAppSelector(getMyTasks)
+  const suggestions = useAppSelector(getSuggestions)
+  const user = useAppSelector(getUser)
 
   const [selectedTask, setSelectedTask] = useState<null | Task>(null);
   const [loading, setLoading] = useState(false);
-  const suggestions = useAppSelector(getSuggestions)
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -25,20 +28,25 @@ const Tasks: React.FC = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
+      await getMyAccount()
       await getTasks()
     }
     fetchTasks()
   }, [])
 
-  const handleAddTask = (title: string) => {
+  const handleAddTask = async (title: string, description: string) => {
     const newTask: TaskRequest = {
-      user_id: 0,
-      title: "",
-      description: "",
+      user_id: user!.id,
+      title: title,
+      description: description,
       due_date: new Date(),
-      status: ""
+      status: "OPEN"
     };
-    // setTasks([...tasks, newTask]);
+    await addTask(newTask).then(async res => {
+      if (res) {
+        await getTasks()
+      }
+    })
   };
 
   const handleDescriptionChange = (description: string) => {

@@ -59,9 +59,10 @@ export class AuthService {
 
   async login (loginRequest: LoginRequest): Promise<LoginResponse | undefined> {
     const response = await this.client.login(loginRequest)
-    console.log('response', response)
     const tokens = response?.data as AuthToken
     store.dispatch(setToken(tokens))
+    const user = await this.client.getMyAccount()
+    store.dispatch(setUser(user))
     return response
   }
 

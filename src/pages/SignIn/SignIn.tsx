@@ -3,6 +3,7 @@ import { Grid, TextField, Button, Typography, Divider } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginRequest } from "../../types/LoginRequest";
 import { login } from "../../core/requests/login";
+import { getMyAccount } from "../../core/requests/getMyAccount";
 
 const SignIn: React.FC = () => {
     const [loginUser, setLoginUser] = useState<LoginRequest>({
